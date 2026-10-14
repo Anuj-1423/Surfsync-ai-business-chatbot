@@ -8,7 +8,7 @@
 
 | Check | Result |
 | --- | --- |
-| `npm test` | Passed: 16 tests, 0 failures |
+| `npm test` | Passed: 17 tests, 0 failures; includes a mocked Resend HTTPS send |
 | `npx tsc --noEmit` | Passed |
 | `npm run build` | Passed; production build and route generation completed |
 | HTTP route smoke checks | Passed: `/`, `/chat`, `/team`, `/projects`, and both project stories returned 200; unknown route returned 404 |
@@ -27,7 +27,7 @@ The automated suite covers chat and lead request validation, prompt-injection in
 - The tests use local SQLite and do not submit a lead to the configured Supabase project.
 - Gmail notification delivery and live OpenRouter responses are not exercised by the automated suite.
 - The real customer/team handoff was exercised end to end through the production HTTP APIs; the full visual browser flow and mobile team inbox still need a browser walk-through. The earlier mocked browser harness timed out before reaching its expected state.
-- Gmail was accepted by the configured SMTP transport (`emailSent: true`); actual inbox placement was not independently verified.
+- Gmail SMTP was accepted in the local integration check (`emailSent: true`); actual inbox placement was not independently verified. Render Free blocks outbound SMTP, so production email should use the Resend HTTPS path after its API key and sending domain are configured.
 - The live AI test consumed the configured provider quota, and the marked Gmail test message was sent to the configured recipient. Temporary customer, chat, query, and lead database records were removed after the checks.
 - Production deployment is excluded.
 - The assignment brief calls for digital marketing, logo design, Shopify, and n8n coverage; the chatbot now explains these enquiry areas and says the team confirms scope and feasibility. The official website does not publish detailed deliverables for these areas.
