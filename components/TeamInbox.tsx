@@ -158,9 +158,9 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
     <PanelContainer className={embedded ? "team-embedded team-embedded-login" : "team-login-shell"}>
       <form className="team-login-card" onSubmit={(event) => void signIn(event)}>
         {!embedded && <a className="team-back-link" href="/">â† Back to SurfSync chat</a>}
-        <div className="eyebrow">SURFSYNC TEAM</div>
-        <h1>{embedded ? "Team member panel" : "Team inbox"}</h1>
-        <p>Sign in to appear online, receive visitor requests, and accept live chats. Visitors can use the chat panel beside this one.</p>
+        <div className="eyebrow">PRIVATE TEAM WORKSPACE</div>
+        <h1>{embedded ? "Welcome back" : "Sign in to your inbox"}</h1>
+        <p>Manage incoming requests, reply to customers, and review their conversation history from one place.</p>
         <label>Email<input type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
         <label>Password<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
         {error && <p className="team-error" role="alert">{error}</p>}
@@ -172,15 +172,32 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
 
   return (
     <PanelContainer className={embedded ? "team-embedded team-embedded-inbox" : "team-inbox-shell"}>
+      <div className="team-workspace-layout">
+      <aside className="team-workspace-rail" aria-label="Team inbox navigation">
+        <div className="team-rail-brand"><span aria-hidden="true">S</span><div><strong>SurfSync</strong><small>TEAM WORKSPACE</small></div></div>
+        <div className="team-rail-section-label">WORKSPACE</div>
+        <div className="team-rail-tabs" role="tablist" aria-label="Team inbox sections">
+          <button type="button" role="tab" aria-selected={inboxView === "requests"} className={inboxView === "requests" ? "selected" : ""} onClick={() => setInboxView("requests")}>
+            <span className="team-rail-tab-icon" aria-hidden="true">01</span><span><strong>Live requests</strong><small>{waiting.length} waiting · {active.length} active</small></span>
+          </button>
+          <button type="button" role="tab" aria-selected={inboxView === "queries"} className={inboxView === "queries" ? "selected" : ""} onClick={() => { setInboxView("queries"); setSelectedCustomerId((current) => current || customerHistories[0]?.userId || ""); }}>
+            <span className="team-rail-tab-icon" aria-hidden="true">02</span><span><strong>Customer queries</strong><small>{customerHistories.length} customer{customerHistories.length === 1 ? "" : "s"}</small></span>
+          </button>
+        </div>
+        <div className="team-rail-bottom"><span className="team-rail-online-dot" /> Inbox is active while this page is open</div>
+      </aside>
+      <div className="team-workspace-content">
       <header className="team-inbox-header">
-        <div><a className="team-back-link" href="/">â† SurfSync</a><h1>Team inbox</h1></div>
+        <div className="team-title-block">{!embedded && <a className="team-back-link" href="/">← SurfSync home</a>}<span className="team-title-kicker">CUSTOMER SUPPORT</span><h1>Team inbox</h1><p className="team-header-caption">Customer conversations and project questions</p></div>
         <div className="team-presence"><i /> Online · {onlineAgents.length} {onlineAgents.length === 1 ? "member" : "members"}<button type="button" onClick={() => void signOut()}>Sign out</button></div>
       </header>
       {error && <p className="team-error team-banner" role="alert">{error}</p>}
-      <div className="inbox-tabs" role="tablist" aria-label="Team inbox sections">
-        <button type="button" className={inboxView === "requests" ? "selected" : ""} onClick={() => setInboxView("requests")}>Requests</button>
-        <button type="button" className={inboxView === "queries" ? "selected" : ""} onClick={() => { setInboxView("queries"); setSelectedCustomerId((current) => current || customerHistories[0]?.userId || ""); }}>User queries</button>
-      </div>
+      <section className="team-overview" aria-label="Inbox overview">
+        <div className="team-overview-heading"><span>OVERVIEW</span><strong>Today at a glance</strong></div>
+        <div className="team-overview-stat"><span>WAITING</span><strong>{waiting.length.toString().padStart(2, "0")}</strong><small>requests to review</small></div>
+        <div className="team-overview-stat"><span>IN PROGRESS</span><strong>{active.length.toString().padStart(2, "0")}</strong><small>active conversations</small></div>
+        <div className="team-overview-stat"><span>TEAM ONLINE</span><strong>{onlineAgents.length.toString().padStart(2, "0")}</strong><small>{onlineAgents.length === 1 ? "member available" : "members available"}</small></div>
+      </section>
       <div className="inbox-grid">
         {inboxView === "requests" ? <aside className="inbox-sidebar">
           <section><h2>Waiting <span>{waiting.length}</span></h2>
@@ -226,6 +243,8 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
             }} placeholder="Write a reply..." /><button className="submit-button" disabled={busy || !draft.trim()}>Send</button></form>}
           </>}
         </section>
+      </div>
+      </div>
       </div>
     </PanelContainer>
   );

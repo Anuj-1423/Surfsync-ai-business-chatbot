@@ -454,8 +454,8 @@ export default function ChatWidget({ loginEnabled = true, onCustomerAuthChange }
     <section className={`chat-card account-gate${loginEnabled ? "" : " account-redirecting"}`} aria-label={loginEnabled ? "Customer sign in" : "Opening login page"}>
       {!loginEnabled ? <div className="account-gate-content"><h2>Opening login page...</h2></div> : <div className="account-gate-content">
         <div className="eyebrow">SURFSYNC CHAT</div>
-        <h2>{authMode === "register" ? "Create your account" : "Sign in to continue"}</h2>
-        <p>Create a customer account or sign in to chat with SurfSync. Your name and chatbot questions will be saved with your account and visible to the authorized SurfSync team.</p>
+        <h2>{authMode === "register" ? "Create your account" : "Start a conversation"}</h2>
+        <p>Sign in to talk through a project, explore SurfSync services, and keep your conversations together. Create an account if this is your first visit.</p>
         <div className="auth-mode-switch" role="tablist" aria-label="Account options">
           <button type="button" className={authMode === "login" ? "selected" : ""} onClick={() => { setAuthMode("login"); setAuthError(""); setAuthNotice(""); }}>Sign in</button>
           <button type="button" className={authMode === "register" ? "selected" : ""} onClick={() => { setAuthMode("register"); setAuthError(""); setAuthNotice(""); }}>Create account</button>
@@ -469,24 +469,47 @@ export default function ChatWidget({ loginEnabled = true, onCustomerAuthChange }
           {!supabase && <p className="team-error">Customer accounts aren't configured yet. Please contact SurfSync.</p>}
           <button className="submit-button" disabled={authBusy || !supabase}>{authBusy ? "Please wait..." : authMode === "register" ? "Create account" : "Sign in and chat"}</button>
         </form>
-        <p className="team-login-hint">SurfSync team member? Sign in using the separate team panel.</p>
+        <p className="team-login-hint">Part of the SurfSync team? <a href="/team">Open the team inbox.</a></p>
       </div>}
     </section>
   );
 
   return (
-    <section className="chat-card" aria-label="Chat with SurfSync">
+    <div className="customer-workspace-layout">
+      <aside className="customer-sidebar" aria-label="Your SurfSync workspace">
+        <div className="customer-sidebar-kicker">CUSTOMER WORKSPACE</div>
+        <div className="customer-sidebar-profile">
+          <span className="customer-sidebar-avatar" aria-hidden="true">{customer.name.trim().slice(0, 1).toUpperCase()}</span>
+          <span><strong>{customer.name}</strong><small>Signed in</small></span>
+        </div>
+        <div className="customer-sidebar-section">
+          <span className="customer-sidebar-label">CURRENT CONVERSATION</span>
+          <div className="customer-current-conversation">
+            <i aria-hidden="true" />
+            <span><strong>Project desk</strong><small>{liveChat?.status === "active" ? "Connected to the team" : liveChat?.status === "waiting" ? "Team request pending" : "SurfSync assistant"}</small></span>
+          </div>
+        </div>
+        <div className="customer-sidebar-actions">
+          <span className="customer-sidebar-label">NEXT STEP</span>
+          {liveChat?.status !== "active" && liveChat?.status !== "waiting" && <button className="customer-human-button" type="button" disabled={handoffBusy || isWaiting} onClick={() => void requestTeamMember()}>{handoffBusy ? "Connecting…" : "Request a team member"}</button>}
+          <button className="customer-enquiry-button" type="button" disabled={Boolean(enquiryStage)} onClick={startGuidedEnquiry}>{enquiryStage ? "Enquiry in progress" : "Start a project enquiry"}</button>
+        </div>
+        <button className="customer-sidebar-signout" type="button" onClick={() => void signOutCustomer()}>Sign out</button>
+      </aside>
+
+      <section className="chat-card" aria-label="Chat with SurfSync">
       <div className="chat-header">
         <div className="assistant-avatar" aria-hidden="true">S</div>
-        <div className="assistant-info"><strong>SurfSync</strong><span><i /> Signed in as {customer.name}</span></div>
-        <button className="account-signout" type="button" onClick={() => void signOutCustomer()}>Sign out</button>
-        <button
-          className="end-chat-button"
-          type="button"
-          aria-label="End chat"
-          disabled={isWaiting || handoffBusy}
-          onClick={() => void endChat()}
-        >â†»</button>
+        <div className="assistant-info"><strong>SurfSync project desk</strong><span><i /> Signed in as {customer.name}</span></div>
+        <div className="chat-header-actions">
+          <button
+            className="end-chat-button"
+            type="button"
+            aria-label="End chat"
+            disabled={isWaiting || handoffBusy}
+            onClick={() => void endChat()}
+          >â†»</button>
+        </div>
       </div>
 
       <div className="messages" ref={messagesRef} role="log" aria-live="polite" aria-relevant="additions">
@@ -542,11 +565,9 @@ export default function ChatWidget({ loginEnabled = true, onCustomerAuthChange }
       </form>
       <div className="chat-footer">
         <span>{liveChat?.status === "active" ? `${liveChat.assignedAgent || "A team member"} joined. You're chatting live.` : liveChat?.status === "waiting" ? `Request sent. ${onlineAgents ? `${onlineAgents} team member${onlineAgents === 1 ? "" : "s"} online` : "Waiting for a team member"} to accept.` : onlineAgents ? `${onlineAgents} team member${onlineAgents === 1 ? "" : "s"} online Â· Share project details in the guided enquiry.` : "No team members online right now. You can still request a reply or leave an enquiry."}</span>
-        {liveChat?.status !== "active" && liveChat?.status !== "waiting" && <button type="button" disabled={handoffBusy || isWaiting} onClick={() => void requestTeamMember()}>{handoffBusy ? "Connecting..." : "Talk to a person"}</button>}
-        <button type="button" disabled={Boolean(enquiryStage)} onClick={startGuidedEnquiry}>{enquiryStage ? "Enquiry in progress" : "Start project enquiry"} <span aria-hidden="true">â†—</span></button>
       </div>
 
-
-    </section>
+      </section>
+    </div>
   );
 }

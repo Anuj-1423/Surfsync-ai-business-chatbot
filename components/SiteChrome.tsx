@@ -7,14 +7,15 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
         <span className="brand-mark" aria-hidden="true">S</span>
         <span>Surf<span>Sync</span><small>INFOTECH</small></span>
       </a>
+      <div className="chrome-context"><span>Digital products &amp; business technology</span><small>SECTOR 73 · NOIDA</small></div>
       <a className="site-link" href="https://surfsyncinfotech.in/" target="_blank" rel="noreferrer">
-        Visit our website <span aria-hidden="true">↗</span>
+        Explore SurfSync <span aria-hidden="true">→</span>
       </a>
     </header>
     {children}
     <footer className="page-footer">
       <span>SurfSync Infotech Pvt. Ltd. · Sector 73, Noida</span>
-      <div className="page-footer-links"><a href="mailto:info@surfsyncinfotech.in">info@surfsyncinfotech.in</a><a href="/">Switch account</a></div>
+      <div className="page-footer-links"><a href="mailto:info@surfsyncinfotech.in">Contact the team</a><a href="/">Change workspace</a></div>
     </footer>
   </>;
 }
