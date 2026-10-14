@@ -11,6 +11,7 @@ import { saveLead } from "../lib/leads";
 import { POST as chatPost } from "../app/api/chat/route";
 import { POST as leadPost } from "../app/api/leads/route";
 import { GET as healthGet } from "../app/api/health/route";
+import { sendLeadNotification } from "../lib/lead-notification";
 
 const testDirectory = await mkdtemp(join(tmpdir(), "surfsync-prd-"));
 const originalWorkingDirectory = process.cwd();
@@ -21,6 +22,7 @@ delete process.env.SUPABASE_SECRET_KEY;
 delete process.env.SUPABASE_SERVICE_ROLE_KEY;
 delete process.env.GMAIL_USER;
 delete process.env.GMAIL_APP_PASSWORD;
+delete process.env.RESEND_API_KEY;
 
 after(async () => {
   process.chdir(originalWorkingDirectory);
@@ -256,4 +258,35 @@ test("health endpoint reports configuration state without exposing credentials",
   assert.equal(response.status, 200);
   assert.deepEqual(body, { status: "ok", aiConfigured: false, supabaseConfigured: false, leadEmailConfigured: false });
   assert.equal(JSON.stringify(body).includes("KEY"), false);
+});
+
+test("lead notifications use the Resend HTTPS API when configured", async () => {
+  const originalFetch = globalThis.fetch;
+  process.env.RESEND_API_KEY = "re_test_key";
+  globalThis.fetch = async (input, init) => {
+    assert.equal(String(input), "https://api.resend.com/emails");
+    assert.equal(new Headers(init?.headers).get("authorization"), "Bearer re_test_key");
+    assert.equal(new Headers(init?.headers).get("idempotency-key"), "lead-test-reference");
+    const payload = JSON.parse(String(init?.body));
+    assert.equal(payload.to[0], "anujsingh41086@gmail.com");
+    assert.equal(payload.reply_to, "customer@example.com");
+    assert.match(payload.text, /A demo company website/);
+    return Response.json({ id: "email_test_id" }, { status: 200 });
+  };
+  try {
+    const sent = await sendLeadNotification({
+      submissionId: "a04b3a5e-0e29-4c23-9ce6-1cfe46387c57",
+      name: "Test Customer",
+      email: "customer@example.com",
+      service: "Web Development",
+      description: "A demo company website",
+      budget: "",
+      timeline: "",
+      consent: true
+    }, "test-reference");
+    assert.equal(sent, true);
+  } finally {
+    globalThis.fetch = originalFetch;
+    delete process.env.RESEND_API_KEY;
+  }
 });

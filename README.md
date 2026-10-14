@@ -43,6 +43,8 @@ Copy `.env.example` to `.env.local` and set the approved values. Next.js loads `
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public Supabase Auth key used by customer and team sign-in; `NEXT_PUBLIC_SUPABASE_ANON_KEY` is accepted as a legacy fallback |
 | `SUPABASE_SECRET_KEY` | Privileged server-only credential; `SUPABASE_SERVICE_ROLE_KEY` is accepted as a legacy fallback. Never prefix either with `NEXT_PUBLIC_` |
 | `LEAD_NOTIFICATION_EMAIL` | Enquiry notification recipient; defaults to `anujsingh41086@gmail.com` |
+| `RESEND_API_KEY` | Optional server-only Resend API key. Preferred for Render Free because it sends over HTTPS instead of SMTP |
+| `LEAD_EMAIL_FROM` | Verified sender address for Resend; defaults to `SurfSync Enquiries <info@surfsyncinfotech.in>` |
 | `GMAIL_USER` | Gmail account used by the server to send lead notifications |
 | `GMAIL_APP_PASSWORD` | Gmail App Password; do not use the account's normal password |
 
@@ -79,7 +81,7 @@ Customer sign-in, query history, and live handoff require Supabase configuration
 
 - `GET /api/customer` verifies a signed-in customer account and returns its profile and latest conversation history. `POST /api/chat` requires that customer's bearer token, accepts `{ "message": "...", "history": [...], "conversationId": "..." }`, and saves the question and response for the team history view.
 - `POST /api/leads` validates the lead, requires `consent: true`, and returns a server-created reference only after storage succeeds. The `submissionId` UUID makes client retries idempotent.
-- Lead notifications are emailed to `LEAD_NOTIFICATION_EMAIL` (defaults to `anujsingh41086@gmail.com`) after storage. Set `GMAIL_USER` and `GMAIL_APP_PASSWORD` in `.env.local`; use a Google App Password generated with 2-Step Verification enabled. A mail delivery issue does not discard the saved enquiry.
+- Lead notifications are emailed to `LEAD_NOTIFICATION_EMAIL` (defaults to `anujsingh41086@gmail.com`) after storage. Configure `RESEND_API_KEY` and a verified `LEAD_EMAIL_FROM` for Render Free; its HTTPS API avoids Render's blocked SMTP ports. Local development can use `GMAIL_USER` and a Google App Password in `GMAIL_APP_PASSWORD`. A mail delivery issue does not discard the saved enquiry.
 - `GET /api/health` returns service status and AI/database configuration booleans only.
 
 ## Tests and production build

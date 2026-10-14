@@ -99,7 +99,13 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
     setBusy(true); setError("");
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (authError || !data.session) { setError("Sign in failed. Use an account enabled for the SurfSync team inbox."); return; }
+    if (authError || !data.session) {
+      const authMessage = authError?.message.toLowerCase() ?? "";
+      if (authMessage.includes("invalid login credentials")) setError("Supabase rejected the email or password. Check both values and try again.");
+      else if (authMessage.includes("email not confirmed")) setError("Confirm this team's email address in Supabase Auth before signing in.");
+      else setError("Could not reach Supabase Auth. Check the connection and try again.");
+      return;
+    }
     setAccessToken(data.session.access_token);
   }
 
