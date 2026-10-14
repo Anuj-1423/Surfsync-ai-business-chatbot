@@ -139,20 +139,31 @@ function buildGroundedFallback(messages) {
     return `${knowledge.process} To get started, contact ${contact.email} or tell me what you would like to build and I can help prepare a project enquiry.`;
   }
   if (/technolog|react native|flutter|stack/.test(normalized)) {
-    return `SurfSync's website specifically names React Native and Flutter for mobile app development. It does not publish a complete technology-stack list. For other technology questions, contact ${contact.email}.`;
+    return `SurfSync lists React Native and Flutter for mobile app development. Its website doesn't publish a complete technology list. What technology are you asking about?`;
   }
   if (/product|swagat|hrms|crm|patronping|saas/.test(normalized)) {
     return `SurfSync's website lists these products: ${knowledge.products.join(", ")}. It does not provide detailed specifications for each product, so the team can share the current information at ${contact.email}.`;
   }
   if (matchingService) {
-    const additionalDetail = matchingService.name === "Mobile Development"
-      ? " The website specifically mentions React Native and Flutter."
-      : "";
-    return `${matchingService.description}${additionalDetail} ${knowledge.process} For scope, pricing, or timelines, SurfSync can advise after understanding your requirements. Contact ${contact.email}, or tell me a little more about your project.`;
+    if (matchingService.name === "Web Development") {
+      if (/restaurant|cafe|café|food|bakery/.test(context)) {
+        return `A restaurant website sounds like a fit for SurfSync's Web Development service. The company describes its websites as modern, responsive, and easy to manage. What would you like customers to find on the site?`;
+      }
+      return `SurfSync builds modern, responsive websites that are easy to manage. What kind of website are you planning?`;
+    }
+    if (matchingService.name === "Mobile Development") {
+      return `SurfSync builds iOS and Android apps and lists React Native and Flutter. Are you planning for iOS, Android, or both?`;
+    }
+    if (matchingService.name === "AI & Automation") {
+      return `SurfSync offers AI and automation to help automate repeated work. What task or process would you like to improve?`;
+    }
+    if (matchingService.name === "E-commerce & CMS") {
+      return `SurfSync offers e-commerce and CMS services, including online stores. What would you like to sell or manage online?`;
+    }
+    return `${matchingService.description} What are you hoping to build?`;
   }
   if (/service|what do you|what can you/.test(normalized)) {
-    const names = knowledge.services.map((service) => service.name).join(", ");
-    return `SurfSync lists these services: ${names}. What are you hoping to accomplish? I can point you toward a suitable service.`;
+    return `SurfSync offers web and mobile development, e-commerce, AI and automation, cloud and DevOps, and enterprise IT. Which are you interested in?`;
   }
   return `I don't have verified information to answer that accurately. I can help with SurfSync's services, products, published client story, contact details, or the process. For anything not covered on the website, please ask the team at ${contact.email} or ${contact.phone}.`;
 }

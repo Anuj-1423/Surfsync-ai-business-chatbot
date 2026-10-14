@@ -62,6 +62,18 @@ test("answers known service questions with website-supported details", async () 
   assert.match(result.reply, /React Native and Flutter/);
 });
 
+test("gives a concise, relevant response to a restaurant website enquiry", async () => {
+  const response = await post("/api/chat", {
+    messages: [{ role: "user", content: "I want to make a website for the restaurant" }]
+  });
+  const result = await response.json();
+  assert.equal(response.status, 200);
+  assert.match(result.reply, /restaurant website/i);
+  assert.match(result.reply, /modern, responsive/i);
+  assert.match(result.reply, /What would you like customers to find/i);
+  assert.doesNotMatch(result.reply, /Free Analytics|cloud deployment|training\/documentation|Contact info@/i);
+});
+
 test("uses prior turns to answer contextual follow-up questions without an AI key", async () => {
   const response = await post("/api/chat", {
     messages: [
