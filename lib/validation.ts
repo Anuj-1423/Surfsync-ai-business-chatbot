@@ -5,6 +5,11 @@ const serviceNames = [
   "Web Development",
   "Mobile Development",
   "E-commerce & CMS",
+  "WhatsApp Business API",
+  "Digital Marketing",
+  "Logo & Brand Design",
+  "Shopify Development",
+  "n8n Workflow Automation",
   "Cloud & DevOps",
   "Enterprise IT Solutions",
   "UI/UX Design",
@@ -24,7 +29,8 @@ const historyMessageSchema = z.object({
 
 export const chatRequestSchema = z.object({
   message: z.string().trim().min(1, "Please enter a message.").max(2000),
-  history: z.array(historyMessageSchema).max(10).default([])
+  history: z.array(historyMessageSchema).max(10).default([]),
+  conversationId: z.uuid().optional()
 });
 
 const optionalPhoneSchema = z.preprocess(

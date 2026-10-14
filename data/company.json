@@ -1,0 +1,157 @@
+{
+  "company": {
+    "name": "SurfSync Infotech Pvt. Ltd.",
+    "overview": "SurfSync Infotech is a Noida-based team that builds AI tools, websites, mobile apps, and software for startups and enterprises. Its website describes work across India and internationally and states that it has delivered 250+ projects.",
+    "location": "Noida, Uttar Pradesh, India",
+    "certification": "The website states that SurfSync is ISO 9001:2015 certified.",
+    "contact": {
+      "email": "info@surfsyncinfotech.in",
+      "phone": "+91 9429694356",
+      "website": "https://surfsyncinfotech.in/"
+    }
+  },
+  "services": [
+    {
+      "name": "AI & Automation",
+      "description": "AI-powered tools, smart workflows, and chatbots to reduce repeated work and help customers faster."
+    },
+    {
+      "name": "Web Development",
+      "description": "Modern websites and web apps, from an initial version to tools a team uses every day."
+    },
+    {
+      "name": "Mobile Development",
+      "description": "iOS and Android applications. The website specifically mentions React Native and Flutter."
+    },
+    {
+      "name": "E-commerce & CMS",
+      "description": "Online shops and CMS sites with safe payments. The published Drive Tribe Tyres story describes clear filters, a full product catalog, and checkout."
+    },
+    {
+      "name": "Cloud & DevOps",
+      "description": "Cloud hosting and go-live support designed to grow with a product."
+    },
+    {
+      "name": "Enterprise IT Solutions",
+      "description": "Enterprise software and digital transformation, including new screens that work alongside existing systems."
+    },
+    {
+      "name": "UI/UX Design",
+      "description": "The website lists user-focused UI/UX design support."
+    },
+    {
+      "name": "Digital Marketing",
+      "description": "SurfSync can discuss SEO, Google Ads, Meta Ads, lead generation, and digital marketing strategy. The channel mix, deliverables, and availability are confirmed with the team after understanding the business goals."
+    },
+    {
+      "name": "Logo & Brand Design",
+      "description": "Logo and brand identity design requests can be discussed with the SurfSync team. The visual scope and deliverables are confirmed after discovery."
+    },
+    {
+      "name": "Shopify Development",
+      "description": "Shopify store projects can be discussed, including storefront setup, product management, and payment gateway needs. The team confirms platform fit and exact scope for each project."
+    },
+    {
+      "name": "n8n Workflow Automation",
+      "description": "n8n workflow and API integration requests can be discussed as part of AI and automation projects. The team confirms connector support and workflow feasibility for the systems involved."
+    },
+    {
+      "name": "WhatsApp Business API",
+      "description": "The website lists official WhatsApp Business API for sales and support."
+    },
+    {
+      "name": "Analytics setup",
+      "description": "The website lists analytics setup as an offering."
+    },
+    {
+      "name": "Training & Documentation",
+      "description": "The website lists step-by-step guides and training/documentation for teams."
+    }
+  ],
+  "serviceScopeNotes": {
+    "digitalMarketing": "The assignment specifically requires the chatbot to cover SEO, Google Ads, Meta Ads, lead generation, and digital marketing strategies. The team must confirm channels, deliverables, and availability for each enquiry.",
+    "logoDesign": "The assignment specifically requires logo-design enquiries. Confirm visual scope and deliverables with the team after discovery.",
+    "shopify": "The assignment specifically requires Shopify enquiries. Confirm platform fit, supported integrations, and exact scope with the team.",
+    "n8n": "The assignment specifically requires n8n workflow enquiries. Confirm connector support and workflow feasibility with the team."
+  },
+  "integrations": {
+    "description": "SurfSync's Magento and Angular service pages describe backend APIs and integrations for payments, analytics, and messaging. The exact integration depends on the project.",
+    "sourcePages": [
+      "https://surfsyncinfotech.in/services/ecommerce-cms/magento",
+      "https://surfsyncinfotech.in/services/web/angular"
+    ]
+  },
+  "products": [
+    "Swagat Suite",
+    "HRMS",
+    "Sales CRM",
+    "PatronPing"
+  ],
+  "portfolio": {
+    "url": "https://surfsyncinfotech.in/projects",
+    "publishedClientStories": [
+      {
+        "name": "Drive Tribe Tyres",
+        "description": "A published client story describes an online tyre store with clear filters, a full product catalog, and checkout. The quoted client is Ameer Sohail.",
+        "url": "/projects/drive-tribe-tyres"
+      },
+      {
+        "name": "Infocus Publications",
+        "description": "A published testimonial says SurfSync built a website for Infocus Publications; the client praised its fit to their requirements and the team's communication. The quoted client is Shubham Sutar.",
+        "url": "/projects/infocus-publications"
+      }
+    ],
+    "industriesMentioned": [
+      "Banking & Financial Services",
+      "Insurance",
+      "Healthcare",
+      "Life Sciences",
+      "Industrial",
+      "Software & Hi-Tech",
+      "Telecom & Media",
+      "Consumer Tech"
+    ],
+    "note": "Individual project pages in this chatbot summarize the published SurfSync client stories and link back to the official source. The official website does not publish a direct public URL for each client project."
+  },
+  "process": "SurfSync describes its process as Discover, Plan, Build, and Launch. It says it combines strategy, design, and engineering, with regular communication and training/documentation for teams.",
+  "pricing": "The website does not publish project pricing. Costs depend on project requirements; ask the SurfSync team for a quote.",
+  "timeline": "The website FAQ says a landing page may take 2–4 weeks and a full web or mobile app typically 8–16 weeks. Timelines depend on scope; SurfSync provides an estimate after discovery.",
+  "maintenance": "The website says SurfSync stays with clients after go-live for fixes, updates, and the next version. Ask the team to confirm the support arrangements for a specific project.",
+  "technologies": [
+    "React Native",
+    "Flutter"
+  ],
+  "faqs": [
+    {
+      "question": "How do I get started?",
+      "answer": "Contact SurfSync at info@surfsyncinfotech.in or +91 9429694356 to discuss your requirements."
+    },
+    {
+      "question": "How long does a typical project take?",
+      "answer": "The website FAQ says a landing page may take 2–4 weeks and a full web or mobile app typically 8–16 weeks. SurfSync provides an estimate after discovery."
+    },
+    {
+      "question": "Do you work with clients outside India?",
+      "answer": "SurfSync says it works with clients across India and internationally."
+    },
+    {
+      "question": "What makes your SaaS platform different?",
+      "answer": "The website names Swagat Suite, HRMS, Sales CRM, and PatronPing, but does not publish detailed product comparisons or differentiators."
+    },
+    {
+      "question": "Does SurfSync offer digital marketing?",
+      "answer": "SurfSync can discuss SEO, Google Ads, Meta Ads, lead generation, and digital marketing strategy. The team confirms channel mix and deliverables after learning about your goals."
+    }
+  ],
+  "source": {
+    "url": "https://surfsyncinfotech.in/",
+    "pages": [
+      "https://surfsyncinfotech.in/",
+      "https://surfsyncinfotech.in/about",
+      "https://surfsyncinfotech.in/projects",
+      "https://surfsyncinfotech.in/services/ecommerce-cms/magento",
+      "https://surfsyncinfotech.in/services/web/angular"
+    ],
+    "accessed": "2026-10-15"
+  }
+}

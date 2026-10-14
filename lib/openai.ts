@@ -11,12 +11,18 @@ export async function generateAnswer(messages: ChatMessage[]): Promise<AnswerRes
   }
 
   try {
-    const openai = new OpenAI({ apiKey, timeout: 15_000, maxRetries: 1 });
+    const openai = new OpenAI({
+      apiKey,
+      ...(process.env.OPENAI_BASE_URL ? { baseURL: process.env.OPENAI_BASE_URL } : {}),
+      timeout: 15_000,
+      maxRetries: 1
+    });
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: getOpenAIMessages(messages),
-      temperature: 0.2,
-      max_tokens: 350
+      temperature: 0.1,
+      // Free reasoning models may need extra tokens before producing their final answer.
+      max_tokens: 900
     });
     const answer = completion.choices[0]?.message?.content?.trim();
     if (!answer) throw new Error("Empty model response");

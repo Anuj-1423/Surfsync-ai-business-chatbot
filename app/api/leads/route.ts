@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { saveLead } from "@/lib/leads";
+import { sendLeadNotification } from "@/lib/lead-notification";
 import { isRateLimited } from "@/lib/rate-limit";
 import { leadRequestSchema } from "@/lib/validation";
 
@@ -31,7 +32,13 @@ export async function POST(request: Request) {
 
   try {
     const saved = await saveLead(parsed.data);
-    return NextResponse.json({ success: true, reference: saved.id, duplicate: saved.duplicate }, { status: 201 });
+    let emailSent = false;
+    try {
+      emailSent = await sendLeadNotification(parsed.data, saved.id);
+    } catch {
+      console.error("Lead email notification failed.");
+    }
+    return NextResponse.json({ success: true, reference: saved.id, duplicate: saved.duplicate, emailSent }, { status: 201 });
   } catch (error) {
     console.error("Lead persistence failed:", error instanceof Error ? error.message : "Unknown storage error");
     return NextResponse.json(
