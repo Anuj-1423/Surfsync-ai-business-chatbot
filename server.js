@@ -108,9 +108,10 @@ function buildGroundedFallback(messages) {
     "UI/UX Design": ["ui/ux", "ui", "ux", "design"]
   };
   const previousUserMessage = messages.slice(0, -1).findLast((item) => item.role === "user")?.content || "";
-  const context = /\b(it|that|those|they|their|its|this|there|both|same|also|too)\b/.test(normalized)
-    ? `${previousUserMessage.toLowerCase()} ${normalized}`
-    : normalized;
+  const previousAssistantMessage = messages.slice(0, -1).findLast((item) => item.role === "assistant")?.content || "";
+  const recentContext = messages.slice(0, -1).filter((item) => item.role === "user").slice(-2)
+    .map((item) => item.content.toLowerCase()).join(" ");
+  const context = `${recentContext} ${normalized}`.trim();
   const matchingService = knowledge.services.find((service) =>
     serviceKeywords[service.name]?.some((keyword) =>
       keyword.length <= 2 ? new RegExp(`\\b${keyword}\\b`).test(context) : context.includes(keyword)
@@ -118,7 +119,7 @@ function buildGroundedFallback(messages) {
   );
 
   if (/^(hi|hello|hey|good morning|good afternoon|good evening)\b/.test(normalized)) {
-    return `Hello! I'm SurfSync's virtual assistant. I can help you explore our services or connect you with the team. What are you looking to build?`;
+    return "Hi! What are you hoping to build or improve?";
   }
   if (/price|pricing|cost|budget|quote|estimate/.test(normalized)) {
     return `SurfSync hasn't published pricing on its website. Project costs depend on the requirements, so please contact the team for a quote at ${contact.email} or ${contact.phone}. If you share a few project details, I can help you prepare an enquiry.`;
@@ -129,7 +130,7 @@ function buildGroundedFallback(messages) {
   if (/mainten|support plan|support policy|service level|sla/.test(normalized)) {
     return `SurfSync's website mentions support for larger teams, but does not publish a specific maintenance plan or SLA. Please confirm current support options with ${contact.email}.`;
   }
-  if (/contact|email|phone|call|address|location/.test(normalized)) {
+  if (/contact|email|phone|call|office address|company address|your address|contact details|location/.test(normalized)) {
     return `You can reach SurfSync at ${contact.email} or ${contact.phone}. The office address listed on the website is ${knowledge.company.location}.`;
   }
   if (/portfolio|project|case stud|client|work sample/.test(normalized)) {
@@ -144,12 +145,21 @@ function buildGroundedFallback(messages) {
   if (/product|swagat|hrms|crm|patronping|saas/.test(normalized)) {
     return `SurfSync's website lists these products: ${knowledge.products.join(", ")}. It does not provide detailed specifications for each product, so the team can share the current information at ${contact.email}.`;
   }
+  if (/restaurant|cafe|café|food|bakery/.test(context) &&
+      /what would you like customers to find|what kind of website/.test(previousAssistantMessage.toLowerCase())) {
+    const requirements = message.replace(/[.!?]+$/, "").trim();
+    return `Got it — a restaurant website with ${requirements}. SurfSync offers web development, though its website doesn't confirm specific restaurant features. What city is the restaurant in?`;
+  }
+  if (/react native|android apps|mobile apps/.test(previousAssistantMessage.toLowerCase()) &&
+      /\b(ios|android|both|either|iphone)\b/.test(normalized)) {
+    return `Got it — ${/\bboth\b/.test(normalized) ? "iOS and Android" : normalized.includes("android") ? "Android" : "iOS"} app development. SurfSync lists React Native and Flutter. What should the app help people do?`;
+  }
   if (matchingService) {
     if (matchingService.name === "Web Development") {
-      if (/restaurant|cafe|café|food|bakery/.test(context)) {
-        return `A restaurant website sounds like a fit for SurfSync's Web Development service. The company describes its websites as modern, responsive, and easy to manage. What would you like customers to find on the site?`;
+      if (/restaurant|cafe|café|food|bakery/.test(normalized)) {
+        return `A restaurant website sounds like a fit for SurfSync's Web Development service. SurfSync describes its websites as modern, responsive, and easy to manage. What would you like customers to find on the site?`;
       }
-      return `SurfSync builds modern, responsive websites that are easy to manage. What kind of website are you planning?`;
+      return `SurfSync offers modern, responsive web development. What kind of website are you planning?`;
     }
     if (matchingService.name === "Mobile Development") {
       return `SurfSync builds iOS and Android apps and lists React Native and Flutter. Are you planning for iOS, Android, or both?`;

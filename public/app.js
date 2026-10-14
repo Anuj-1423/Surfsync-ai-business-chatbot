@@ -103,7 +103,7 @@ suggestionsElement.addEventListener("click", (event) => {
 document.querySelector("#restart-button").addEventListener("click", () => {
   history.length = 0;
   messagesElement.replaceChildren();
-  appendMessage("assistant", "Hi there! I'm SurfSync's virtual assistant. I can help you explore our services, products, and the work we share on our website. What would you like to know?");
+  appendMessage("assistant", "Hi! What are you hoping to build or improve?");
   messageInput.value = "";
   messageInput.focus();
 });
@@ -113,6 +113,24 @@ function openLeadForm() {
   formStatus.textContent = "";
   formStatus.classList.remove("error");
   leadForm.querySelectorAll(".field-error").forEach((element) => { element.textContent = ""; });
+  const userMessages = history.filter((message) => message.role === "user").map((message) => message.content);
+  const conversation = userMessages.join(" ").toLowerCase();
+  const serviceSelect = leadForm.elements.service;
+  const serviceOptions = [
+    ["Mobile Development", /\b(mobile|android|ios|flutter|react native)\b/],
+    ["E-commerce & CMS", /\b(e-?commerce|online store|shopify)\b/],
+    ["AI & Automation", /\b(ai|automation|chatbot|workflow)\b/],
+    ["Cloud & DevOps", /\b(cloud|devops)\b/],
+    ["Enterprise IT Solutions", /\b(enterprise|hrms|saas|crm)\b/],
+    ["UI/UX Design", /\b(ui\/ux|design)\b/],
+    ["Web Development", /\b(website|web site|web development|landing page)\b/]
+  ];
+  const matchedService = serviceOptions.find(([, pattern]) => pattern.test(conversation))?.[0];
+  if (matchedService) serviceSelect.value = matchedService;
+  if (userMessages.length) {
+    const summary = userMessages.slice(-4).join("\n");
+    leadForm.elements.description.value = summary.slice(0, 2000);
+  }
   leadDialog.showModal();
 }
 

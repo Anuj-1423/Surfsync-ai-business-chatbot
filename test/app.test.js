@@ -39,6 +39,9 @@ test("serves the chat page and health status without exposing a provider key", a
   assert.equal(page.status, 200);
   assert.match(page.headers.get("content-type"), /text\/html/);
   assert.match(page.headers.get("content-security-policy"), /frame-ancestors 'none'/);
+  const pageHtml = await page.text();
+  assert.doesNotMatch(pageHtml, /virtual assistant/i);
+  assert.match(pageHtml, /Use chat in enquiry/);
   const health = await (await fetch(`${baseUrl}/api/health`)).json();
   assert.deepEqual(health, { status: "ok", aiConfigured: false });
 });
@@ -72,6 +75,31 @@ test("gives a concise, relevant response to a restaurant website enquiry", async
   assert.match(result.reply, /modern, responsive/i);
   assert.match(result.reply, /What would you like customers to find/i);
   assert.doesNotMatch(result.reply, /Free Analytics|cloud deployment|training\/documentation|Contact info@/i);
+});
+
+test("keeps project discovery conversational and remembers restaurant requirements", async () => {
+  const response = await post("/api/chat", {
+    messages: [
+      { role: "user", content: "I want to make a website for my restaurant" },
+      { role: "assistant", content: "What would you like customers to find on the site?" },
+      { role: "user", content: "Menu, address and online ordering" }
+    ]
+  });
+  const result = await response.json();
+  assert.equal(response.status, 200);
+  assert.match(result.reply, /restaurant website with Menu, address and online ordering/i);
+  assert.match(result.reply, /doesn't confirm specific restaurant features/i);
+  assert.match(result.reply, /What city is the restaurant in/i);
+});
+
+test("greets naturally without calling itself a virtual assistant", async () => {
+  const response = await post("/api/chat", {
+    messages: [{ role: "user", content: "Hello" }]
+  });
+  const result = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(result.reply, "Hi! What are you hoping to build or improve?");
+  assert.doesNotMatch(result.reply, /virtual assistant|AI assistant/i);
 });
 
 test("uses prior turns to answer contextual follow-up questions without an AI key", async () => {
