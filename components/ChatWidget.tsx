@@ -134,7 +134,7 @@ export default function ChatWidget({ loginEnabled = true, onCustomerAuthChange }
       if (!response.ok || !result.user) {
         setAuthError(result.error || "This account can't use the visitor chat. Sign in with a customer account.");
         setCustomer(null);
-        await supabase?.auth.signOut();
+        await supabase?.auth.signOut({ scope: "local" });
         return;
       }
       setAuthError("");
@@ -430,7 +430,7 @@ export default function ChatWidget({ loginEnabled = true, onCustomerAuthChange }
         });
       } catch { /* Sign out remains available if the handoff service is unavailable. */ }
     }
-    await supabase?.auth.signOut();
+    await supabase?.auth.signOut({ scope: "local" });
     setLiveChat(null);
     setMessages([{ ...greeting, id: 0, time: "Just now" }]);
     setChatEnded(false);

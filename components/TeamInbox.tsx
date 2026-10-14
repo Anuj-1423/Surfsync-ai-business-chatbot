@@ -66,7 +66,7 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
       if (!response.ok) throw new Error(result.error || "Couldn't load the inbox.");
       if (result.role !== "team") {
         setError("This account isn't enabled for the SurfSync team inbox.");
-        await supabase?.auth.signOut();
+        await supabase?.auth.signOut({ scope: "local" });
         setAccessToken("");
         return;
       }
@@ -75,7 +75,9 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
       setCurrentAgentId(result.currentAgentId ?? "");
       setSelectedCustomerId((current) => current || result.customers?.[0]?.userId || "");
       setOnlineAgents(result.onlineAgents ?? []);
-      setSelectedId((current) => current || result.chats?.find((chat: Chat) => chat.status === "active")?.id || result.chats?.[0]?.id || "");
+      // Keep the inbox neutral on first load. A previous conversation should only
+      // open after the team member explicitly selects it.
+      setSelectedId((current) => current && result.chats?.some((chat: Chat) => chat.id === current) ? current : "");
       setError("");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Couldn't load the inbox.");
@@ -111,7 +113,7 @@ export default function TeamInbox({ embedded = false, loginEnabled, onTeamAuthCh
 
   async function signOut() {
     try { await request({ action: "offline" }); } catch { /* Session can expire between polls. */ }
-    await supabase?.auth.signOut();
+    await supabase?.auth.signOut({ scope: "local" });
     setAccessToken(""); setChats([]); setSelectedId("");
   }
 
