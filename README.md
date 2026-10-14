@@ -1,82 +1,86 @@
 # SurfSync AI Business Chatbot
 
-A responsive business assistant grounded in the published content at [surfsyncinfotech.in](https://surfsyncinfotech.in/). The project includes an optional server-side OpenAI-compatible chat integration, a grounded local response mode that works without an AI key, and consent-based SQLite lead capture.
+A responsive, conversational website for SurfSync Infotech grounded in information published at [surfsyncinfotech.in](https://surfsyncinfotech.in/). The implementation follows the project PRD: Next.js App Router with TypeScript, OpenAI server-side chat, Supabase PostgreSQL lead storage, Zod validation, and a Vercel-ready deployment.
 
 ## Features
 
-- Responsive business-chat interface styled around SurfSync's orange, warm-white, and charcoal website palette.
-- Verified company knowledge in [`data/company.json`](data/company.json), including its services, products, contact details, published client story, and explicit unknowns around pricing, timelines, and support policies.
-- Optional OpenAI Chat Completions API integration. The API key remains on the server; the model receives a restrictive instruction to use only the included knowledge.
-- No-key fallback responses for common company questions, including an explicit fallback when a fact cannot be verified.
-- Lead form with field validation and affirmative consent, backed by a local SQLite database.
-- Basic HTTP input-size limits, chat rate limiting, security headers, and clear errors.
-- Native Node.js implementation; no application dependencies to install.
+- Next.js/React chat interface with short, contextual replies, follow-up questions, mobile layout, suggested prompts, and project-enquiry handoff.
+- Verified company information in [`data/company.json`](data/company.json); unknown prices, delivery times, product details, and policies are not invented.
+- OpenAI Chat Completions integration runs exclusively on the server. A knowledge-based response mode keeps local development usable if no API key is configured or the model temporarily fails.
+- Validated lead submission with required consent and server-generated timestamps.
+- Supabase leads table with Row Level Security, no public read/write policies, server-only service-role use, and an idempotency UUID to prevent repeat submissions.
+- SQLite lead storage for local development only; production requires Supabase configuration.
+- Zod request validation, request-size limits through field schemas, in-memory endpoint rate limiting, safe responses, response security headers, and prompt-injection instructions.
+- Health endpoint reports whether the AI and Supabase are configured without returning secret values.
 
 ## Requirements
 
-- Node.js 22.13 or newer (Node 24 LTS is recommended).
-- An OpenAI API key only if AI-generated, context-aware conversations are needed. Without it, the deterministic knowledge-base chatbot remains usable. API usage may incur charges; get company approval before setting a paid API key.
+- Node.js 22.13+.
+- OpenAI API key for generated AI responses. Without it, the local, deterministic, knowledge-grounded response path is used. OpenAI usage may incur charges; get SurfSync approval before setting a paid key.
+- Supabase project for production lead persistence.
+- Vercel project/account for deployment.
 
 ## Run locally
 
 ```powershell
-npm start
+npm install
+npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The SQLite database is created at `data/leads.sqlite`; the `data/` runtime files are git-ignored.
+Open [http://localhost:3000](http://localhost:3000). Without Supabase credentials, leads are saved to local SQLite at `data/leads.sqlite` for development. Do not use that local database as production storage.
 
-To enable AI responses, set `OPENAI_API_KEY` and optionally `OPENAI_MODEL` in your shell or hosting dashboard (for example, `$env:OPENAI_API_KEY="..."` in PowerShell before running the server). `.env.example` documents supported settings; the app does not automatically load `.env` files. Never put keys in frontend files or commit them.
+Copy `.env.example` to `.env.local` and set the approved values. Next.js loads `.env.local` during development:
 
-Supported server settings:
+| Variable | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | Server-only OpenAI secret; leave empty for local knowledge-based responses |
+| `OPENAI_MODEL` | OpenAI chat model; defaults to `gpt-4o-mini` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL, used only in server handlers |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Documented for the project setup; not needed by the server-only leads flow and never grants lead access |
+| `SUPABASE_SERVICE_ROLE_KEY` | Privileged server-only credential; never prefix it with `NEXT_PUBLIC_` |
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `PORT` | `3000` | HTTP listening port |
-| `DATABASE_PATH` | `./data/leads.sqlite` | SQLite database path |
-| `OPENAI_API_KEY` | unset | Enables OpenAI-compatible generated responses |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Chat completions model |
-| `OPENAI_BASE_URL` | OpenAI chat completions URL | Optional compatible API endpoint |
+Never commit `.env.local`, provider keys, or Supabase service-role credentials.
 
-`OPENAI_BASE_URL` and credentials must point to an API provider approved by SurfSync. An empty key is a supported, fully working non-generative mode.
+## Supabase setup
 
-## Lead capture and privacy
+1. Create an approved Supabase project.
+2. In its SQL editor, run [`supabase/schema.sql`](supabase/schema.sql).
+3. Configure `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in the local `.env.local` file or deployment secrets.
+4. Keep Row Level Security enabled. The schema revokes table access from `anon` and `authenticated` and grants it only to `service_role`. The app never exposes a leads read endpoint.
+5. Verify the application can create a lead; test that anonymous Supabase clients cannot read, update, or delete rows.
 
-The lead form captures name, email, optional phone, requested service, project description, and optional budget and timeline. The form requires explicit consent; the server independently checks consent and validates the submission before inserting it into the `leads` SQLite table. A successful submission returns a reference number.
+The service-role key bypasses RLS and is used only inside server API routes. Do not put it in browser code or a `NEXT_PUBLIC_` variable.
 
-Leads are stored on the application server; no email or CRM delivery has been configured. The SurfSync team must access the database or configure a later CRM/email integration. Before production, configure a persistent, access-controlled database volume, agree a retention/deletion policy, and verify the company's privacy notice and consent wording. Do not deploy on ephemeral storage if lead records must survive restarts or redeployments. SQLite is suitable for a small single-instance MVP; use a managed database for concurrent multi-instance deployments.
+## API routes
 
-## Testing
+- `POST /api/chat` accepts `{ "message": "...", "history": [{ "role": "user|assistant", "content": "..." }] }` and returns `{ "answer": "...", "status": "success|fallback" }`.
+- `POST /api/leads` validates the lead, requires `consent: true`, and returns a server-created reference only after storage succeeds. The `submissionId` UUID makes client retries idempotent.
+- `GET /api/health` returns service status and AI/database configuration booleans only.
 
-Run the server and lead-capture/API checks:
+## Tests and production build
 
 ```powershell
 npm test
+npx tsc --noEmit
+npm run build
 ```
 
-Test report (2026-10-14): **8 passed, 0 failed.** Automated checks cover static serving, security headers, health status, verified service and pricing answers, contextual follow-ups and unknown-question fallback, chat validation, lead consent/email validation, and writing a valid lead to SQLite. Manual browser checks confirmed the chat and lead form flow and no horizontal overflow at a 390px viewport. The browser test lead was removed after verification.
+The automated tests cover request/lead validation, grounding and injection instructions, unknown/pricing fallback, rate limiting, chat API responses, health configuration disclosure, SQLite development lead capture, preservation of legacy local leads during schema migration, explicit consent, and duplicate lead retries.
 
-## Deployment
+## Deploy to Vercel
 
-This app is a standard Node.js HTTP service. The included [`render.yaml`](render.yaml) prepares it for Render in Singapore with a 1 GB persistent disk for SQLite:
+1. Push this project to a GitHub repository.
+2. Import the repository in Vercel and use the Next.js framework preset.
+3. Add `OPENAI_API_KEY`, `OPENAI_MODEL`, `NEXT_PUBLIC_SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` to the Vercel project’s environment settings. Add the anon key only if needed for later client features; the current app does not use a client Supabase connection.
+4. Run [`supabase/schema.sql`](supabase/schema.sql) in the selected production project before deployment.
+5. Deploy and verify `/api/health`, grounded service questions, an unknown question, invalid lead rejection, missing-consent rejection, successful lead creation, and duplicate retries. Test the UI at mobile and desktop sizes.
+6. Confirm OpenAI and hosting costs with SurfSync before enabling paid usage. Set budget alerts and review provider rate limits.
+7. Hand over the private database access procedure, retention/deletion policy, and lead-processing owner to the company.
 
-1. Create a **private** Git repository and push the project source.
-2. In Render, create a Blueprint instance from that repository and review the plan and region before applying.
-3. The blueprint selects Render's `starter` web-service plan and a persistent 1 GB disk. Review the current Render charges and get SurfSync's approval before provisioning; neither service creation nor charges are triggered by this source file.
-4. Add `OPENAI_API_KEY` and optionally `OPENAI_MODEL` in Render's secret/environment settings only if AI-provider use is approved. Otherwise the knowledge-grounded fallback is available.
-5. Deploy and verify `/api/health`, a service question, an unknown question, consent-required lead validation, and a successful test lead.
-6. Restrict production database access, arrange lead handover to SurfSync, and delete test data.
+No public Vercel URL is included yet: the workspace does not have a connected GitHub repository, Vercel project credentials, Supabase project URL/service key, or an approved OpenAI API key. The code and deployment configuration are prepared; deployment and production database/model verification remain dependent on company account setup.
 
-The application source and Render blueprint are prepared, but no live URL is included: this workspace has no Git repository, Render-account connection, or approved AI-provider key. Deployment and public URL verification require a private repository connected to Render, access to the Render account, approval of any paid services, and (for generated AI responses) an approved provider key.
+## Verified business content and limitations
 
-## Business content provenance and limits
+The knowledge base records `https://surfsyncinfotech.in/` as its source and was reviewed on 2026-10-14. It includes SurfSync's listed services, products, Noida contact details, ISO 9001:2015 statement, 4+ countries-served statement, published Drive Tribe Tyres testimonial, and listed industries. The website does not publish pricing, standard project timelines, detailed product specifications, or a specific maintenance/SLA policy. The assistant must say when information is unavailable.
 
-The source URL and access date are recorded inside `data/company.json`. The information was taken from the official homepage's service, about, products, projects, FAQ, testimonial, and contact content as accessed on 2026-10-14. The site lists React Native and Flutter but does not publish a complete stack list. It does not publish prices, standard timelines, or detailed maintenance/SLA terms; these are stated as unknown rather than invented. The published homepage shows a Drive Tribe Tyres testimonial, not a verifiable project case-study URL.
-
-## Handover checklist
-
-- [ ] Private source repository URL shared with the company.
-- [ ] Hosting account and persistent storage configured and approved.
-- [ ] Production public URL opened and tested on desktop and mobile.
-- [ ] AI-provider key added as a hosting secret, if approved.
-- [ ] SQLite/managed database access and lead-processing owner handed over.
-- [ ] Retention, deletion, privacy-notice, and CRM/email integration decisions completed.
+The local fallback is intentionally not a substitute for the configured OpenAI integration; the service health endpoint identifies when OpenAI is unavailable. In-memory rate limits are best-effort per server instance and should be replaced with shared rate limiting before substantial production traffic. No email/CRM lead delivery or admin dashboard is included. Supabase lead access remains restricted to server-side service-role operations.

@@ -2,14 +2,31 @@
   "name": "surfsync-ai-business-chatbot",
   "version": "1.0.0",
   "private": true,
-  "description": "A knowledge-grounded business chatbot and consent-based lead capture for SurfSync Infotech.",
+  "description": "A grounded AI business chatbot and consent-based lead capture for SurfSync Infotech.",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "test": "node --test"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --conditions=react-server --import tsx --test"
   },
   "engines": {
     "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "next": "^16.4.0",
+    "openai": "^7.33.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
   }
 }
