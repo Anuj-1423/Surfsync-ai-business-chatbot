@@ -106,7 +106,7 @@ See [`TESTING.md`](TESTING.md) for the latest local test results and what this r
 6. Confirm OpenAI and hosting costs with SurfSync before enabling paid usage. Set budget alerts and review provider rate limits.
 7. Hand over the private database access procedure, retention/deletion policy, and lead-processing owner to the company.
 
-No public Vercel URL is included yet: the workspace does not have a connected GitHub repository, Vercel project credentials, Supabase project URL/service key, or an approved OpenAI API key. The code and deployment configuration are prepared; deployment and production database/model verification remain dependent on company account setup.
+A Vercel URL was supplied for the assessment: https://surfsync-ai-business-chatbot-nzxwqgmps.vercel.app/. Its availability could not be independently verified from this environment. The workspace does not include a source repository URL or confirmed production environment configuration, so the deployed database, model, and lead-email integrations remain unverified. See [`ASSESSMENT_SUBMISSION.md`](ASSESSMENT_SUBMISSION.md) for the submission details and current verification results.
 
 ## Verified business content and limitations
 
