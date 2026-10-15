@@ -34,7 +34,7 @@ export function buildGroundedFallback(messages: ChatMessage[]): string {
   )?.[0];
   const matchingService = latestMatchingService ?? contextualService;
 
-  if (/^(hi|hello|hey|good morning|good afternoon|good evening)\b/.test(normalized)) {
+  if (/^(hi|hello|hey|what'?s up|how are you|how'?s it going|good morning|good afternoon|good evening)\b/.test(normalized)) {
     return "Hi! What are you hoping to build or improve?";
   }
   if (/price|pricing|cost|budget|quote|estimate/.test(normalized)) {

@@ -105,6 +105,34 @@ test("uses grounded responses when OpenAI is not configured", async () => {
   assert.match(result.answer, /confirmed pricing details/i);
 });
 
+test("uses grounded fallback when a provider returns safety metadata as message text", async () => {
+  const originalFetch = globalThis.fetch;
+  process.env.OPENAI_API_KEY = "test_api_key";
+  globalThis.fetch = async () => Response.json({
+    id: "chatcmpl_test",
+    object: "chat.completion",
+    created: 1,
+    model: "test-model",
+    choices: [{ index: 0, finish_reason: "stop", message: { role: "assistant", content: "User Safety: safe" } }],
+    usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 }
+  });
+  try {
+    const result = await generateAnswer([{ role: "user", content: "What services do you offer?" }]);
+    assert.equal(result.status, "fallback");
+    assert.match(result.answer, /SurfSync works across/i);
+    assert.doesNotMatch(result.answer, /User Safety/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    delete process.env.OPENAI_API_KEY;
+  }
+});
+
+test("fallback handles casual 'what's up' messages with a short greeting", () => {
+  const answer = buildGroundedFallback([{ role: "user", content: "whats up" }]);
+  assert.match(answer, /ready to help|hoping to build/i);
+  assert.doesNotMatch(answer, /I don't have confirmed details/i);
+});
+
 test("lead validation requires valid email, service, and explicit consent", () => {
   const base = {
     submissionId: "80029bf5-6cd7-4f76-b426-62d61347da87",

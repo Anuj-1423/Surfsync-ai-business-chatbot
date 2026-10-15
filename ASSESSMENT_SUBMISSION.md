@@ -44,12 +44,12 @@ The project is prepared for a Next.js deployment. Before deployment, configure t
 
 Checks run on 15 October 2026:
 
-- `npm test`: passed, 17 tests, 0 failures.
+- `npm test`: passed, 19 tests, 0 failures, including regression coverage for provider safety text and casual greetings.
 - `npx tsc --noEmit`: passed.
 - `npm run build`: passed with Next.js 16.4.0; production routes were generated for the home page, customer chat, team inbox, project list and both project stories, plus the API routes.
 - Supplied live URL: not independently verified; HTTP access from the test environment did not return a status code.
 
-The tests cover validation, grounded answers and fallbacks, prompt-injection instructions, lead consent and idempotency, SQLite storage and migration, rate limiting, health configuration disclosure, and a mocked Resend request. `TESTING.md` contains the existing local and integration test report, including its scope and limitations. The automated tests do not verify the supplied deployment or its live database, AI, and email settings.
+The tests cover validation, grounded answers and fallbacks, prompt-injection instructions, provider safety-metadata fallback, casual greetings, lead consent and idempotency, SQLite storage and migration, rate limiting, health configuration disclosure, and a mocked Resend request. `TESTING.md` contains the existing local and integration test report, including its scope and limitations. The automated tests do not verify the supplied deployment or its live database, AI, and email settings.
 
 ## Known Limitations
 
@@ -62,6 +62,7 @@ The tests cover validation, grounded answers and fallbacks, prompt-injection ins
 - Rate limiting is in memory and best-effort per server instance; shared rate limiting is advisable for substantial production traffic.
 - The full visual browser walkthrough and mobile team-inbox walkthrough remain outstanding in the existing testing report.
 - The company should set a retention and deletion policy for saved customer chats, queries, and handoff transcripts.
+- Vercel's Node.js major is pinned to `22.x` in `package.json` to avoid automatically moving to a future major version.
 
 ## Completion Date
 

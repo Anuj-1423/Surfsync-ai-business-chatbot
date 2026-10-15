@@ -50,12 +50,24 @@ function formatTime() {
 }
 
 function renderMessageText(text: string) {
-  const parts = text.split(/(https?:\/\/[^\s]+|\/projects\/[a-z0-9-]+)/gi);
-  return parts.flatMap((part, index) => {
-    if (!/^https?:\/\//i.test(part) && !/^\/projects\//i.test(part)) return [part];
-    const url = part.replace(/[.,!?;:]+$/, "");
-    const punctuation = part.slice(url.length);
-    return [<a href={url} key={`${index}-${url}`} target={url.startsWith("http") ? "_blank" : undefined} rel={url.startsWith("http") ? "noreferrer" : undefined}>{url}</a>, punctuation];
+  return text.split(/\r?\n/).flatMap((rawLine, lineIndex) => {
+    const bullet = rawLine.match(/^\s*[-*]\s+(.*)$/);
+    const line = bullet?.[1] ?? rawLine;
+    const parts = line.split(/(\*\*[^*]+\*\*|https?:\/\/[^\s]+|\/projects\/[a-z0-9-]+)/gi);
+    const renderedParts = parts.map((part, partIndex) => {
+      const key = `${lineIndex}-${partIndex}`;
+      if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={key}>{part.slice(2, -2)}</strong>;
+      if (!/^https?:\/\//i.test(part) && !/^\/projects\//i.test(part)) return part;
+      const url = part.replace(/[.,!?;:]+$/, "");
+      const punctuation = part.slice(url.length);
+      return <span key={key}><a href={url} target={url.startsWith("http") ? "_blank" : undefined} rel={url.startsWith("http") ? "noreferrer" : undefined}>{url}</a>{punctuation}</span>;
+    });
+
+    return [
+      ...(lineIndex ? [<br key={`break-${lineIndex}`} />] : []),
+      ...(bullet ? [<span aria-hidden="true" key={`bullet-${lineIndex}`}>• </span>] : []),
+      ...renderedParts
+    ];
   });
 }
 

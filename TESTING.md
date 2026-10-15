@@ -8,7 +8,7 @@
 
 | Check | Result |
 | --- | --- |
-| `npm test` | Passed: 17 tests, 0 failures; includes a mocked Resend HTTPS send |
+| `npm test` | Passed: 19 tests, 0 failures; includes provider safety-metadata fallback, casual greeting fallback, and a mocked Resend HTTPS send |
 | `npx tsc --noEmit` | Passed |
 | `npm run build` | Passed; production build and route generation completed |
 | HTTP route smoke checks | Passed: `/`, `/chat`, `/team`, `/projects`, and both project stories returned 200; unknown route returned 404 |
@@ -20,7 +20,7 @@
 | Closed-chat reload behavior | Initially failed: closed chats were returned by the customer history endpoint. Fixed to return no current chat, rebuilt, and retested successfully (`chat: null` after close) |
 | Gmail enquiry notification | Passed at SMTP send: a marked test enquiry returned `emailSent: true`; its Supabase lead row was deleted afterward. Inbox receipt was not independently checked |
 
-The automated suite covers chat and lead request validation, prompt-injection instructions, grounded fallback responses, pricing and unknown-service replies, portfolio links, rate limiting, the unavailable-Supabase response, health configuration disclosure, and consent-checked/idempotent local SQLite lead storage including legacy-schema migration. Existing fallback expectations cover assignment-required services and individual project-story links.
+The automated suite covers chat and lead request validation, prompt-injection instructions, grounded fallback responses, provider safety-metadata fallback, casual greeting fallback, pricing and unknown-service replies, portfolio links, rate limiting, the unavailable-Supabase response, health configuration disclosure, and consent-checked/idempotent local SQLite lead storage including legacy-schema migration. Existing fallback expectations cover assignment-required services and individual project-story links.
 
 ## Limits of this report
 

@@ -8,6 +8,8 @@ function isProviderSafetyMetadata(answer: string) {
   return /^\s*(?:user|response)\s+safety\s*:/i.test(answer);
 }
 
+const MAX_CUSTOMER_ANSWER_LENGTH = 1200;
+
 export async function generateAnswer(messages: ChatMessage[]): Promise<AnswerResult> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -33,6 +35,7 @@ export async function generateAnswer(messages: ChatMessage[]): Promise<AnswerRes
     // Some OpenAI-compatible models return moderation metadata as message text.
     // It is not a customer-facing answer, so use the grounded local response.
     if (isProviderSafetyMetadata(answer)) throw new Error("Provider returned safety metadata instead of an answer");
+    if (answer.length > MAX_CUSTOMER_ANSWER_LENGTH) throw new Error("Provider response exceeded the customer answer limit");
     return { answer: answer.slice(0, 4000), status: "success" };
   } catch {
     return { answer: buildGroundedFallback(messages), status: "fallback" };
